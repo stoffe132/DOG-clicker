@@ -52,13 +52,13 @@ upgrades.push({
 
 // Passiv inkomst
 let baseCost = 100n;
-let basePassive = 1n; // första uppgradering ger exakt 1/sek
+let basePassive = 1; // första uppgradering ger exakt 1/sek
 for(let i=0; i<49; i++){
   upgrades.push({
     name: `+${basePassive}/sek`,
     cost: baseCost,
     effect: ()=> passive += basePassive,
-    multiplier: 125n
+    
   });
   baseCost = baseCost * 250n / 100n; // pris ökar
   basePassive *= 2n; // multiplicera först nästa iteration
