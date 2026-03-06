@@ -1,156 +1,9 @@
-
-
-
-
-Lös in erbjudandet
-fix the code <!DOCTYPE html>
-<html lang="sv">
-<head>
-<meta charset="utf-8">
-<title>Dog Clicker</title>
-<style>
-body{margin:0;background:#111;color:#fff;font-family:Arial;text-align:center}
-#count{font-size:40px;margin:20px 0}
-#idle{font-size:20px;margin-bottom:10px;color:#ccc}
-img{width:300px;cursor:pointer;user-select:none;transition:transform 0.1s}
-#upgrades{max-height:600px;overflow-y:auto;margin:10px auto;width:220px;text-align:center}
-button{margin:5px;padding:10px 16px;font-size:16px;width:200px;display:block;margin-left:auto;margin-right:auto}
-#resetBtn{position:fixed;top:20px;left:20px;width:auto !important;display:inline-block !important;padding:10px 16px;z-index:9999}
-</style>
-</head>
-<body>
-
-<h1>Dog Clicker</h1>
-<div id="count">0</div>
-<div id="idle">Idle: 0/sek</div>
-<img id="dog" src="dog.jpg" alt="dog"><br>
-<button id="resetBtn">Radera data</button>
-<div id="upgrades"></div>
-
-<audio id="clickSound" src="click.mp3"></audio>
-<audio id="buySound" src="buy.mp3"></audio>
-
-<script>
-// Hämtar sparade värden eller startvärden med BigInt
-let count = BigInt(localStorage.getItem("count") || 0);
-let clickPower = BigInt(localStorage.getItem("clickPower") || 1);
-let passive = BigInt(localStorage.getItem("passive") || 0);
-
-const countEl = document.getElementById("count");
-const idleEl = document.getElementById("idle");
-const dog = document.getElementById("dog");
-const upgradesContainer = document.getElementById("upgrades");
-
-const clickSound = document.getElementById("clickSound");
-const buySound = document.getElementById("buySound");
-
-// Uppgraderingar
-let upgrades = [];
-
-// Klickkraft
-upgrades.push({
-  name: "Klickkraft +1",
-  cost: 50n,
-  effect: ()=> clickPower += 1n,
-  multiplier: 115n
-});
-
-// Passiv inkomst
-let baseCost = 100n;
-let basePassive = 1; // första uppgradering ger exakt 1/sek
-for(let i=0; i<49; i++){
-  upgrades.push({
-    name: +${basePassive}/sek,
-    cost: baseCost,
-    effect: ()=> passive += basePassive,
-    
-  });
-  baseCost = baseCost * 250n / 100n; // pris ökar
-  basePassive *= 2n; // multiplicera först nästa iteration
-}
-
-// Skapar knappar
-upgrades.forEach((u, index)=>{
-  let btn = document.createElement("button");
-  btn.id = "upgrade"+index;
-  btn.textContent = ${u.name} (kostar ${u.cost});
-  
-  btn.addEventListener("click", ()=>{
-    if(count >= u.cost){
-      count -= u.cost;
-      u.effect();
-      u.cost = u.cost * u.multiplier / 100n;
-      btn.textContent = ${u.name} (kostar ${u.cost});
-      buySound.play();
-      updateDisplay();
-      save();
-    }
-  });
-  upgradesContainer.appendChild(btn);
-});
-
-// Klick på hunden
-dog.addEventListener("click", ()=>{
-  count += clickPower;
-  clickSound.play();
-  dog.style.transform="scale(1.1)";
-  setTimeout(()=>dog.style.transform="scale(1)",100);
-  updateDisplay();
-});
-
-// Passiv inkomst
-setInterval(()=>{
-  count += passive;
-  updateDisplay();
-  save();
-},1000);
-
-// Reset-knapp
-document.getElementById("resetBtn").addEventListener("click", ()=>{
-  localStorage.clear();
-  location.reload();
-});
-
-// Display
-function updateDisplay(){
-  countEl.textContent = count.toString();
-  idleEl.textContent = passive > 0 ? Idle: ${passive}/sek : "Ingen passiv inkomst";
-}
-
-// Sparfunktion
-function save(){
-  localStorage.setItem("count", count.toString());
-  localStorage.setItem("clickPower", clickPower.toString());
-  localStorage.setItem("passive", passive.toString());
-}
-
-// Initial uppdatering
-updateDisplay();
-</script>
-
-</body>
-</html>
-
-Flera fel gör att koden kraschar:
-
-basePassive är number men används senare som BigInt.
-
-multiplier saknas på passiv-uppgraderingar men används ändå.
-
-passive += basePassive blandar BigInt och number.
-
-Kostnadsökning använder multiplier som inte finns.
-
-basePassive *= 2n försöker multiplicera number med BigInt.
-
-Fix: använd BigInt konsekvent och ge alla uppgraderingar en multiplier.
-
-Fungerande version
 <!DOCTYPE html>
 <html lang="sv">
 <head>
 <meta charset="utf-8">
 <title>Dog Clicker</title>
+
 <style>
 body{margin:0;background:#111;color:#fff;font-family:Arial;text-align:center}
 #count{font-size:40px;margin:20px 0}
@@ -160,15 +13,21 @@ img{width:300px;cursor:pointer;user-select:none;transition:transform 0.1s}
 button{margin:5px;padding:10px 16px;font-size:16px;width:200px;display:block;margin-left:auto;margin-right:auto}
 #resetBtn{position:fixed;top:20px;left:20px;width:auto !important;display:inline-block !important;padding:10px 16px;z-index:9999}
 </style>
+
 </head>
 <body>
 
 <h1>Dog Clicker</h1>
+
 <div id="count">0</div>
 <div id="idle">Idle: 0/sek</div>
+
 <img id="dog" src="dog.jpg">
+
 <br>
+
 <button id="resetBtn">Radera data</button>
+
 <div id="upgrades"></div>
 
 <audio id="clickSound" src="click.mp3"></audio>
@@ -176,130 +35,161 @@ button{margin:5px;padding:10px 16px;font-size:16px;width:200px;display:block;mar
 
 <script>
 
-let count = BigInt(localStorage.getItem("count") || 0);
-let clickPower = BigInt(localStorage.getItem("clickPower") || 1);
-let passive = BigInt(localStorage.getItem("passive") || 0);
+// sparade värden
+let count = BigInt(localStorage.getItem("count") || 0)
+let clickPower = BigInt(localStorage.getItem("clickPower") || 1)
+let passive = BigInt(localStorage.getItem("passive") || 0)
 
-const countEl = document.getElementById("count");
-const idleEl = document.getElementById("idle");
-const dog = document.getElementById("dog");
-const upgradesContainer = document.getElementById("upgrades");
+const countEl = document.getElementById("count")
+const idleEl = document.getElementById("idle")
+const dog = document.getElementById("dog")
+const upgradesContainer = document.getElementById("upgrades")
 
-const clickSound = document.getElementById("clickSound");
-const buySound = document.getElementById("buySound");
+const clickSound = document.getElementById("clickSound")
+const buySound = document.getElementById("buySound")
 
-let upgrades = [];
+let upgrades = []
 
-// klickkraft
+// nummerförkortning
+function formatNumber(num){
+
+  const units=[
+    {v:1000000000000n,s:"T"},
+    {v:1000000000n,s:"B"},
+    {v:1000000n,s:"M"},
+    {v:1000n,s:"K"}
+  ]
+
+  for(let u of units){
+    if(num>=u.v){
+      let whole=num/u.v
+      let decimal=(num%u.v)*10n/u.v
+      return whole.toString()+"."+decimal.toString()+u.s
+    }
+  }
+
+  return num.toString()
+}
+
+// klickkraft upgrade
 upgrades.push({
   name:"Klickkraft +1",
   cost:50n,
   multiplier:115n,
-  effect:()=>{ clickPower += 1n }
-});
+  effect:()=>{clickPower+=1n}
+})
 
-// passiv inkomst
-let baseCost = 100n;
-let basePassive = 1n;
+// passiva upgrades
+let baseCost=100n
+let basePassive=1n
 
 for(let i=0;i<49;i++){
-  let income = basePassive;
+
+  let income=basePassive
 
   upgrades.push({
     name:`+${income}/sek`,
     cost:baseCost,
     multiplier:125n,
-    effect:()=>{ passive += income }
-  });
+    effect:()=>{passive+=income}
+  })
 
-  baseCost = baseCost * 250n / 100n;
-  basePassive *= 2n;
+  baseCost=baseCost*250n/100n
+  basePassive*=2n
 }
 
 // skapa knappar
 upgrades.forEach((u,index)=>{
-  let btn=document.createElement("button");
-  btn.id="upgrade"+index;
-  btn.textContent=`${u.name} (kostar ${u.cost})`;
+
+  let btn=document.createElement("button")
+  btn.id="upgrade"+index
+
+  btn.textContent=`${u.name} (kostar ${formatNumber(u.cost)})`
 
   btn.onclick=()=>{
+
     if(count>=u.cost){
-      count-=u.cost;
-      u.effect();
 
-      u.cost = u.cost * u.multiplier / 100n;
+      count-=u.cost
 
-      btn.textContent=`${u.name} (kostar ${u.cost})`;
-      buySound.currentTime=0;
-      buySound.play();
+      u.effect()
 
-      updateDisplay();
-      save();
+      u.cost=u.cost*u.multiplier/100n
+
+      btn.textContent=`${u.name} (kostar ${formatNumber(u.cost)})`
+
+      buySound.currentTime=0
+      buySound.play()
+
+      updateDisplay()
+      save()
+
     }
-  };
 
-  upgradesContainer.appendChild(btn);
-});
+  }
+
+  upgradesContainer.appendChild(btn)
+
+})
 
 // klick
 dog.onclick=()=>{
-  count+=clickPower;
 
-  clickSound.currentTime=0;
-  clickSound.play();
+  count+=clickPower
 
-  dog.style.transform="scale(1.1)";
-  setTimeout(()=>dog.style.transform="scale(1)",100);
+  clickSound.currentTime=0
+  clickSound.play()
 
-  updateDisplay();
-};
+  dog.style.transform="scale(1.1)"
 
-// idle
+  setTimeout(()=>dog.style.transform="scale(1)",100)
+
+  updateDisplay()
+
+}
+
+// passiv inkomst
 setInterval(()=>{
-  count+=passive;
-  updateDisplay();
-  save();
-},1000);
+
+  count+=passive
+
+  updateDisplay()
+  save()
+
+},1000)
 
 // reset
 document.getElementById("resetBtn").onclick=()=>{
-  localStorage.clear();
-  location.reload();
-};
 
+  localStorage.clear()
+  location.reload()
+
+}
+
+// display
 function updateDisplay(){
-  countEl.textContent=count.toString();
-  idleEl.textContent = passive>0n ? `Idle: ${passive}/sek` : "Ingen passiv inkomst";
+
+  countEl.textContent=formatNumber(count)
+
+  idleEl.textContent =
+    passive>0n
+    ? `Idle: ${formatNumber(passive)}/sek`
+    : "Ingen passiv inkomst"
+
 }
 
+// spara
 function save(){
-  localStorage.setItem("count",count.toString());
-  localStorage.setItem("clickPower",clickPower.toString());
-  localStorage.setItem("passive",passive.toString());
+
+  localStorage.setItem("count",count.toString())
+  localStorage.setItem("clickPower",clickPower.toString())
+  localStorage.setItem("passive",passive.toString())
+
 }
 
-updateDisplay();
+updateDisplay()
 
 </script>
+
 </body>
 </html>
-Vad som nu fungerar
-Ingen BigInt / number krock.
-
-Alla uppgraderingar har multiplier.
-
-Passiv inkomst dubblas korrekt.
-
-Köp uppgraderingar utan JavaScript-fel.
-
-Vill du kan jag också visa hur man lägger till:
-
-nummerförkortning (1K, 1M, 1B, 1T)
-
-sparade uppgraderingar i localStorage
-
-100+ upgrades utan lagg.
-
-
-
-
