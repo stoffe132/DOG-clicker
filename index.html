@@ -10,7 +10,8 @@ body{margin:0;background:#111;color:#fff;font-family:Arial;text-align:center}
 #idle{font-size:20px;margin-bottom:10px;color:#ccc}
 img{width:300px;cursor:pointer;user-select:none;transition:transform 0.1s}
 #upgrades{max-height:600px;overflow-y:auto;margin:10px auto;width:220px;text-align:center}
-button{margin:5px;padding:10px 16px;font-size:16px;width:200px;display:block;margin-left:auto;margin-right:auto}
+button{margin:5px;padding:10px 16px;font-size:16px;width:200px;display:block;margin-left:auto;margin-right:auto;cursor:pointer}
+button:disabled{opacity:0.5;cursor:not-allowed}
 #resetBtn{position:fixed;top:20px;left:20px;width:auto !important;display:inline-block !important;padding:10px 16px;z-index:9999}
 </style>
 
@@ -35,159 +36,157 @@ button{margin:5px;padding:10px 16px;font-size:16px;width:200px;display:block;mar
 
 <script>
 
-// sparade värden
-let count = BigInt(localStorage.getItem("count") || 0)
-let clickPower = BigInt(localStorage.getItem("clickPower") || 1)
-let passive = BigInt(localStorage.getItem("passive") || 0)
+// Ladda sparade grundvärden
+let count = BigInt(localStorage.getItem("count") || 0);
+let clickPower = BigInt(localStorage.getItem("clickPower") || 1);
+let passive = BigInt(localStorage.getItem("passive") || 0);
 
-const countEl = document.getElementById("count")
-const idleEl = document.getElementById("idle")
-const dog = document.getElementById("dog")
-const upgradesContainer = document.getElementById("upgrades")
+// Hämta sparade priser för uppgraderingar om de finns
+let savedCosts = JSON.parse(localStorage.getItem("upgradeCosts") || "[]");
 
-const clickSound = document.getElementById("clickSound")
-const buySound = document.getElementById("buySound")
+const countEl = document.getElementById("count");
+const idleEl = document.getElementById("idle");
+const dog = document.getElementById("dog");
+const upgradesContainer = document.getElementById("upgrades");
 
-let upgrades = []
+const clickSound = document.getElementById("clickSound");
+const buySound = document.getElementById("buySound");
 
-// nummerförkortning
+let upgrades = [];
+
+// Nummerförkortning
 function formatNumber(num){
-
   const units=[
     {v:1000000000000n,s:"T"},
     {v:1000000000n,s:"B"},
     {v:1000000n,s:"M"},
     {v:1000n,s:"K"}
-  ]
+  ];
 
   for(let u of units){
     if(num>=u.v){
-      let whole=num/u.v
-      let decimal=(num%u.v)*10n/u.v
-      return whole.toString()+"."+decimal.toString()+u.s
+      let whole=num/u.v;
+      let decimal=(num%u.v)*10n/u.v;
+      return whole.toString()+"."+decimal.toString()+u.s;
     }
   }
-
-  return num.toString()
+  return num.toString();
 }
 
-// klickkraft upgrade
+// 1. Skapa Klickkraft-uppgraderingen
 upgrades.push({
   name:"Klickkraft +1",
-  cost:50n,
+  cost: savedCosts[0] ? BigInt(savedCosts[0]) : 50n,
   multiplier:115n,
   effect:()=>{clickPower+=1n}
-})
+});
 
-// passiva upgrades
-let baseCost=100n
-let basePassive=1n
+// 2. Skapa de passiva uppgraderingarna
+let baseCost=100n;
+let basePassive=1n;
 
 for(let i=0;i<49;i++){
-
-  let income=basePassive
+  let income=basePassive;
+  let savedCostIndex = i + 1; // Index 0 är klickkraft
 
   upgrades.push({
     name:`+${income}/sek`,
-    cost:baseCost,
+    cost: savedCosts[savedCostIndex] ? BigInt(savedCosts[savedCostIndex]) : baseCost,
     multiplier:125n,
     effect:()=>{passive+=income}
-  })
+  });
 
-  baseCost=baseCost*250n/100n
-  basePassive*=2n
+  baseCost=baseCost*250n/100n;
+  basePassive*=2n;
 }
 
-// skapa knappar
+// Skapa knappar i DOM och spara referenser till dem
+let upgradeButtons = [];
+
 upgrades.forEach((u,index)=>{
-
-  let btn=document.createElement("button")
-  btn.id="upgrade"+index
-
-  btn.textContent=`${u.name} (kostar ${formatNumber(u.cost)})`
+  let btn=document.createElement("button");
+  btn.id="upgrade"+index;
+  btn.textContent=`${u.name} (kostar ${formatNumber(u.cost)})`;
 
   btn.onclick=()=>{
-
     if(count>=u.cost){
+      count-=u.cost;
+      u.effect();
+      u.cost=u.cost*u.multiplier/100n;
 
-      count-=u.cost
+      btn.textContent=`${u.name} (kostar ${formatNumber(u.cost)})`;
 
-      u.effect()
+      try {
+        buySound.currentTime=0;
+        buySound.play();
+      } catch(e) {}
 
-      u.cost=u.cost*u.multiplier/100n
-
-      btn.textContent=`${u.name} (kostar ${formatNumber(u.cost)})`
-
-      buySound.currentTime=0
-      buySound.play()
-
-      updateDisplay()
-      save()
-
+      updateDisplay();
+      save();
     }
+  };
 
-  }
+  upgradesContainer.appendChild(btn);
+  upgradeButtons.push({ element: btn, upgrade: u });
+});
 
-  upgradesContainer.appendChild(btn)
-
-})
-
-// klick
+// Klick på hunden
 dog.onclick=()=>{
+  count+=clickPower;
 
-  count+=clickPower
+  try {
+    clickSound.currentTime=0;
+    clickSound.play();
+  } catch(e) {}
 
-  clickSound.currentTime=0
-  clickSound.play()
+  dog.style.transform="scale(1.1)";
+  setTimeout(()=>dog.style.transform="scale(1)",100);
 
-  dog.style.transform="scale(1.1)"
+  updateDisplay();
+  save(); // Sparar direkt vid klick så man inte förlorar poäng
+};
 
-  setTimeout(()=>dog.style.transform="scale(1)",100)
-
-  updateDisplay()
-
-}
-
-// passiv inkomst
+// Passiv inkomst (Körs varje sekund)
 setInterval(()=>{
+  count+=passive;
+  updateDisplay();
+  save();
+},1000);
 
-  count+=passive
-
-  updateDisplay()
-  save()
-
-},1000)
-
-// reset
+// Nollställ spel
 document.getElementById("resetBtn").onclick=()=>{
+  localStorage.clear();
+  location.reload();
+};
 
-  localStorage.clear()
-  location.reload()
-
-}
-
-// display
+// Uppdatera gränssnittet
 function updateDisplay(){
-
-  countEl.textContent=formatNumber(count)
+  countEl.textContent=formatNumber(count);
 
   idleEl.textContent =
     passive>0n
     ? `Idle: ${formatNumber(passive)}/sek`
-    : "Ingen passiv inkomst"
+    : "Ingen passiv inkomst";
 
+  // Gråa ut knappar som spelaren inte har råd med
+  upgradeButtons.forEach(item => {
+    item.element.disabled = (count < item.upgrade.cost);
+  });
 }
 
-// spara
+// Spara all data
 function save(){
-
-  localStorage.setItem("count",count.toString())
-  localStorage.setItem("clickPower",clickPower.toString())
-  localStorage.setItem("passive",passive.toString())
-
+  localStorage.setItem("count",count.toString());
+  localStorage.setItem("clickPower",clickPower.toString());
+  localStorage.setItem("passive",passive.toString());
+  
+  // Spara alla dynamiska priser som en array av strängar
+  let costsToSave = upgrades.map(u => u.cost.toString());
+  localStorage.setItem("upgradeCosts", JSON.stringify(costsToSave));
 }
 
-updateDisplay()
+// Körs vid start
+updateDisplay();
 
 </script>
 
