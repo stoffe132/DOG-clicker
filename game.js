@@ -17,7 +17,7 @@ const U=[
 {id:'empire',name:'Hundimperiets strategi',icon:'🌐',cat:'income',desc:'+10% global styrka per nivå.',base:18000n,rate:1300,kind:'global',power:1100},
 {id:'crit',name:'Prickskytte-nos',icon:'🎯',cat:'critical',desc:'+2 procentenheter kritisk chans.',base:3500n,rate:1370,kind:'crit',max:35},
 {id:'critpower',name:'Skallattack',icon:'💥',cat:'critical',desc:'+0,5x kritisk skada per nivå.',base:7000n,rate:1350,kind:'critpower'},
-{id:'luck',name:'Gyllene nos',icon:'✨',cat:'fortune',desc:G('Gör gyllene hundar vanligare.'),base:8000n,rate:1380,kind:'luck',max:100},
+{id:'luck',name:'Gyllene nos',icon:'✨',cat:'fortune',desc:'Gör gyllene hundar vanligare.',base:8000n,rate:1380,kind:'luck',max:100},
 {id:'gold',name:'Guldfångare',icon:'🪙',cat:'fortune',desc:'+35% belöning från gyllene hundar.',base:14000n,rate:1390,kind:'gold'},
 {id:'offline',name:'Drömmarnas hundvakt',icon:'🌙',cat:'utility',desc:'+5 procentenheter offline-inkomst.',base:9000n,rate:1360,kind:'offline',max:10},
 {id:'coupon',name:'Ben-rabatt',icon:'🏷️',cat:'utility',desc:'-1% kostnad per nivå.',base:22000n,rate:1450,kind:'coupon',max:30},
@@ -68,7 +68,6 @@ const A=[
 ['prestige5','Stjärnlegend','Gör fem prestigeomgångar.','🌌',()=>s.prestige>=5],
 ['billion','Benmiljardär','Samla en miljard livstidsben.','👑',()=>big(s.lifetime)>=1000000000n]
 ].map(a=>({id:a[0],name:a[1],desc:a[2],icon:a[3],test:a[4]}));
-function G(x){return x}
 const categories=[['click','👆 Klickkraft'],['income','⚙️ Produktion'],['automation','🤖 Automatik'],['critical','💥 Kritiska träffar'],['fortune','🍀 Tur & guld'],['utility','🧰 Effektivitet']];
 let currentCat='click',currentView='dashboard',goldenUntil=0,lastTick=Date.now(),lastSave=0;
 function lv(id){return clamp(s.upgrades[id],0,1000000)}
