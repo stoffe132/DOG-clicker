@@ -1,26 +1,29 @@
 # DOG EMPIRE — DOG CLICKER
 
-A full rebuild of the original DOG Clicker game.
+Rebuilt clicker game with responsive controls and a dedicated game engine.
 
-## Run
-Open `index.html` in a browser, or enable GitHub Pages for the repository (deploy from the `main` branch and root folder).
+## Play
+Open the GitHub Pages site: https://stoffe132.github.io/DOG-clicker/
 
-## Game systems
-- Responsive DOG EMPIRE interface with dashboard and dedicated game sections
-- Click power, critical hits, automatic clicks and passive production
-- Six upgrade categories with scalable upgrade levels
-- Eight producer types, from puppy helpers to a paw portal
-- Collectible dog companions with permanent bonuses
-- Prestige, star dust and permanent research perks
-- Daily quests, achievements, golden dog events and timed boosts
-- Offline earnings and automatic local saving
-- Save export/import and reset controls
+If the page appears stuck after an update, reload it fully. The game engine uses a versioned URL so browsers fetch the newest file.
 
-## Project files
-- `index.html` — application layout and navigation
-- `style.css` — responsive visual design
-- `game.js` — game logic, progression, upgrades and persistence
-- `dog.jpg` — main dog image used on the dashboard
+## Systems
+- Clickable dog using `dog.jpg` with a visible emoji fallback
+- Six upgrade categories with scalable prices and levels
+- Eight passive producer types
+- Eight collectible dog companions
+- Prestige, star dust and permanent research
+- Critical clicks, golden dog events and timed boosts
+- Daily quests, achievements and statistics
+- Offline earnings and autosaving
+- Import/export and reset controls
+- Central delegated button handling so dynamically rendered shop buttons keep working
+
+## Files
+- `index.html` — page structure and script loading
+- `style.css` — responsive layout and dog hit area
+- `game.js` — game logic, event handling, economy and saves
+- `dog.jpg` — main dog image
 - `click.mp3`, `buy.mp3` — sound effects
 
-The game uses browser local storage for saves. Export a backup before clearing browser data or switching devices.
+Game progress is stored in this browser's local storage. Export a backup before clearing browser data or changing devices.
