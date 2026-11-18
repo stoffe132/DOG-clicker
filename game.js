@@ -7,7 +7,7 @@ const SAVE_KEY = 'dogEmpire_v3';
 const OLD_KEYS = ['dogEmpire_v2', 'dogClickerUltimate_v1'];
 const MAX = 1e300;
 
-const clamp = (n, min = 0, max = MAX) => Math.min(max, Math.max(min, Number.isFinite(Number(n)) ? Number(n) : min));
+const clamp = (n, min = 0, max = MAX) => { const value = Number(n); if (Number.isNaN(value)) return min; if (value === Infinity) return max; if (value === -Infinity) return min; return Math.min(max, Math.max(min, value)); };
 const num = (v, fallback = 0) => {
   if (v === null || v === undefined || v === '') return fallback;
   const n = Number(v);
