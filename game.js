@@ -89,7 +89,7 @@ function sqrt(n){if(n<2n)return n;let x=n/2n,y=(x+n/x)/2n;while(y<x){x=y;y=(x+n/
 function prestigeReward(){const r=big(s.runEarned)/prestigeNeed();return r<1n?0:Number(sqrt(r)>1000000n?1000000n:sqrt(r))}
 function globalBP(){return 1000+s.stars*100+totalPets()*(30+lv('bond')*10)}
 function multiplier(){return BigInt(globalBP())*powRatio(1000n,1100,1000,lv('empire'))/1000n}
-function clickVal(){let v=(1n+big(s.legacyClick)+BigInt(lv('tap')*2))*multiplier();v=v*powRatio(1000n,1200,1000,lv('tapmult'))/1000n;v=v*powRatio(1000n,1100,1000,lv('gloves'))/1000n;v=v*powRatio(1000n,1250,1000,rc('star'))/1000n;return v>0n?v:1n}
+function clickVal(){let v=(1n+big(s.legacyClick)+BigInt(lv('tap')*2))*multiplier()/1000n;v=v*powRatio(1000n,1200,1000,lv('tapmult'))/1000n;v=v*powRatio(1000n,1100,1000,lv('gloves'))/1000n;v=v*powRatio(1000n,1250,1000,rc('star'))/1000n;return v>0n?v:1n}
 function autoVal(){let clicks=BigInt(lv('auto'))+big(s.legacyAuto||0);return clickVal()*clicks*powRatio(1000n,1150,1000,lv('automult'))/1000n}
 function prodVal(){let n=big(s.legacyPassive||0);for(const g of G)n+=g.output*BigInt(gc(g.id));n=n*multiplier()/1000n;n=n*powRatio(1000n,1150,1000,lv('kennel'))/1000n;n=n*powRatio(1000n,1150,1000,rc('factory'))/1000n;return n}
 function income(){let n=prodVal()+autoVal();if(Date.now()<s.boostUntil)n*=2n;return n}
