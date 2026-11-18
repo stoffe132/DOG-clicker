@@ -1,194 +1,100 @@
 <!DOCTYPE html>
 <html lang="sv">
 <head>
-<meta charset="utf-8">
-<title>Dog Clicker</title>
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#17131f">
+<title>DOG CLICKER — Ultimate</title>
 <style>
-body{margin:0;background:#111;color:#fff;font-family:Arial;text-align:center}
-#count{font-size:40px;margin:20px 0}
-#idle{font-size:20px;margin-bottom:10px;color:#ccc}
-img{width:300px;cursor:pointer;user-select:none;transition:transform 0.1s}
-#upgrades{max-height:600px;overflow-y:auto;margin:10px auto;width:220px;text-align:center}
-button{margin:5px;padding:10px 16px;font-size:16px;width:200px;display:block;margin-left:auto;margin-right:auto;cursor:pointer}
-button:disabled{opacity:0.5;cursor:not-allowed}
-#resetBtn{position:fixed;top:20px;left:20px;width:auto !important;display:inline-block !important;padding:10px 16px;z-index:9999}
+:root{--bg:#17131f;--panel:#241d30;--panel2:#30263e;--gold:#ffd166;--pink:#ff8fab;--mint:#8ce0bd;--text:#fff8ee;--muted:#b9acc8;--line:#493a5a}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% -20%,#50335b 0,#17131f 55%);color:var(--text);font:15px system-ui,Arial,sans-serif;min-height:100vh}
+header{padding:22px 16px 12px;text-align:center}h1{margin:0;font-size:clamp(30px,6vw,52px);letter-spacing:3px;color:var(--gold)}header p{color:var(--muted);margin:5px}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;max-width:1050px;margin:12px auto;padding:0 14px}.stat,.panel{background:linear-gradient(145deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:16px;padding:14px;text-align:center;box-shadow:0 8px 24px #0003}.stat small{display:block;color:var(--muted);font-size:12px}.stat strong{display:block;font-size:clamp(17px,3vw,26px);margin-top:4px;overflow-wrap:anywhere}
+main{display:grid;grid-template-columns:minmax(260px, .9fr) minmax(320px,1.1fr);gap:14px;max-width:1050px;margin:12px auto;padding:0 14px 30px}.left,.right{display:flex;flex-direction:column;gap:14px}.dog-area{min-height:340px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden}.dog{font-size:clamp(120px,24vw,190px);cursor:pointer;user-select:none;filter:drop-shadow(0 12px 8px #0005);transition:transform .08s}.dog:active{transform:scale(.92)}.dog-label{color:var(--muted);margin-top:4px}.golden{position:absolute;right:16px;top:12px;border:1px solid #ad8533;background:#6b4b13;color:#ffe6a1;border-radius:20px;padding:8px 12px;cursor:pointer;display:none}.click-float{position:absolute;pointer-events:none;color:var(--gold);font-weight:900;font-size:22px;animation:float .8s forwards}@keyframes float{to{transform:translateY(-80px);opacity:0}}
+h2{font-size:18px;margin:0 0 12px;color:var(--gold)}.row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}.action{background:#4a365e;color:white;border:1px solid #75598e;border-radius:10px;padding:10px 13px;cursor:pointer;font-weight:700}.action:hover{filter:brightness(1.18)}.action:disabled{opacity:.38;cursor:not-allowed}.primary{background:#80552d;border-color:#d39b50}.danger{background:#672f45;border-color:#a4516d}.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}.tab{flex:1;min-width:85px}.tab.active{background:#80552d;border-color:var(--gold)}.upgrade-list{display:flex;flex-direction:column;gap:7px;max-height:490px;overflow:auto;padding-right:3px}.upgrade{display:flex;align-items:center;gap:10px;text-align:left;background:#211a2b;border:1px solid var(--line);border-radius:12px;padding:10px;color:var(--text)}.upgrade .info{flex:1;min-width:0}.upgrade b{display:block}.upgrade small{color:var(--muted)}.upgrade button{min-width:105px}.muted{color:var(--muted)}.progress{height:8px;background:#15111b;border-radius:9px;overflow:hidden;margin-top:8px}.progress i{display:block;height:100%;background:linear-gradient(90deg,var(--pink),var(--gold));width:0}.achievement{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line);gap:8px}.locked{opacity:.45}.footer{color:var(--muted);text-align:center;font-size:12px;padding:0 15px 20px}
+@media(max-width:720px){.stats{grid-template-columns:repeat(2,1fr)}main{grid-template-columns:1fr}.dog-area{min-height:280px}}
 </style>
-
 </head>
 <body>
-
-<h1>Dog Clicker</h1>
-
-<div id="count">0</div>
-<div id="idle">Idle: 0/sek</div>
-
-<img id="dog" src="dog.jpg">
-
-<br>
-
-<button id="resetBtn">Radera data</button>
-
-<div id="upgrades"></div>
-
-<audio id="clickSound" src="click.mp3"></audio>
-<audio id="buySound" src="buy.mp3"></audio>
-
+<header><h1>DOG CLICKER</h1><p>En liten hund. Oändligt många uppgraderingar.</p></header>
+<section class="stats">
+ <div class="stat"><small>🐾 HUNDBEN</small><strong id="bones">0</strong></div>
+ <div class="stat"><small>🖱️ PER KLICK</small><strong id="perClick">1</strong></div>
+ <div class="stat"><small>⏱️ PER SEKUND</small><strong id="perSec">0</strong></div>
+ <div class="stat"><small>⭐ PRESTIGE</small><strong id="prestige">0</strong></div>
+</section>
+<main>
+<div class="left">
+ <section class="panel dog-area">
+  <button id="golden" class="golden">✨ Gyllene hund! Klicka!</button>
+  <div id="dog" class="dog" role="button" tabindex="0" aria-label="Klicka på hunden">🐶</div>
+  <div class="dog-label">Klicka på hunden för hundben</div>
+ </section>
+ <section class="panel">
+  <h2>🌟 Progression</h2><div id="levelText">Nivå 1</div><div class="progress"><i id="levelBar"></i></div>
+  <p class="muted" id="nextLevel">Nästa nivå: 100 hundben</p>
+  <div class="row"><button class="action primary" id="prestigeBtn">Prestige</button><button class="action" id="petBtn">🐕 Köp kompis</button></div>
+  <p class="muted" id="prestigeInfo">Prestige återställer hundben och uppgraderingar men ger permanent bonus.</p>
+ </section>
+ <section class="panel"><h2>🏆 Prestationer</h2><div id="achievements"></div></section>
+ <section class="panel"><h2>⚙️ Speldata</h2><div class="row"><button class="action" id="saveBtn">Spara nu</button><button class="action" id="exportBtn">Exportera</button><button class="action" id="importBtn">Importera</button><button class="action danger" id="resetBtn">Radera allt</button></div><p class="muted" id="saveStatus">Sparas automatiskt på den här enheten.</p></section>
+</div>
+<div class="right">
+ <section class="panel">
+  <h2>🛒 Uppgraderingar</h2>
+  <div class="tabs"><button class="action tab active" data-tab="click">Klick</button><button class="action tab" data-tab="idle">Passiv</button><button class="action tab" data-tab="auto">Automatik</button><button class="action tab" data-tab="special">Special</button></div>
+  <div class="row" style="justify-content:space-between;margin-bottom:9px"><span class="muted" id="upgradePageLabel">Visar 1–20</span><span><button class="action" id="prevPage">←</button> <button class="action" id="nextPage">→</button></span></div>
+  <div id="upgrades" class="upgrade-list"></div>
+ </section>
+ <section class="panel"><h2>🐾 Hundkompisar</h2><div id="pets" class="muted">Inga kompisar ännu.</div></section>
+ <section class="panel"><h2>📜 Händelselogg</h2><div id="log" class="muted">Välkommen till Dog Clicker!</div></section>
+</div>
+</main>
+<div class="footer">DOG CLICKER ULTIMATE · Framsteg sparas lokalt i din webbläsare</div>
 <script>
-
-// Ladda sparade grundvärden
-let count = BigInt(localStorage.getItem("count") || 0);
-let clickPower = BigInt(localStorage.getItem("clickPower") || 1);
-let passive = BigInt(localStorage.getItem("passive") || 0);
-
-// Hämta sparade priser för uppgraderingar om de finns
-let savedCosts = JSON.parse(localStorage.getItem("upgradeCosts") || "[]");
-
-const countEl = document.getElementById("count");
-const idleEl = document.getElementById("idle");
-const dog = document.getElementById("dog");
-const upgradesContainer = document.getElementById("upgrades");
-
-const clickSound = document.getElementById("clickSound");
-const buySound = document.getElementById("buySound");
-
-let upgrades = [];
-
-// Nummerförkortning
-function formatNumber(num){
-  const units=[
-    {v:1000000000000n,s:"T"},
-    {v:1000000000n,s:"B"},
-    {v:1000000n,s:"M"},
-    {v:1000n,s:"K"}
-  ];
-
-  for(let u of units){
-    if(num>=u.v){
-      let whole=num/u.v;
-      let decimal=(num%u.v)*10n/u.v;
-      return whole.toString()+"."+decimal.toString()+u.s;
-    }
-  }
-  return num.toString();
-}
-
-// 1. Skapa Klickkraft-uppgraderingen
-upgrades.push({
-  name:"Klickkraft +1",
-  cost: savedCosts[0] ? BigInt(savedCosts[0]) : 50n,
-  multiplier:115n,
-  effect:()=>{clickPower+=1n}
-});
-
-// 2. Skapa de passiva uppgraderingarna
-let baseCost=100n;
-let basePassive=1n;
-
-for(let i=0;i<49;i++){
-  let income=basePassive;
-  let savedCostIndex = i + 1; // Index 0 är klickkraft
-
-  upgrades.push({
-    name:`+${income}/sek`,
-    cost: savedCosts[savedCostIndex] ? BigInt(savedCosts[savedCostIndex]) : baseCost,
-    multiplier:125n,
-    effect:()=>{passive+=income}
-  });
-
-  baseCost=baseCost*250n/100n;
-  basePassive*=2n;
-}
-
-// Skapa knappar i DOM och spara referenser till dem
-let upgradeButtons = [];
-
-upgrades.forEach((u,index)=>{
-  let btn=document.createElement("button");
-  btn.id="upgrade"+index;
-  btn.textContent=`${u.name} (kostar ${formatNumber(u.cost)})`;
-
-  btn.onclick=()=>{
-    if(count>=u.cost){
-      count-=u.cost;
-      u.effect();
-      u.cost=u.cost*u.multiplier/100n;
-
-      btn.textContent=`${u.name} (kostar ${formatNumber(u.cost)})`;
-
-      try {
-        buySound.currentTime=0;
-        buySound.play();
-      } catch(e) {}
-
-      updateDisplay();
-      save();
-    }
-  };
-
-  upgradesContainer.appendChild(btn);
-  upgradeButtons.push({ element: btn, upgrade: u });
-});
-
-// Klick på hunden
-dog.onclick=()=>{
-  count+=clickPower;
-
-  try {
-    clickSound.currentTime=0;
-    clickSound.play();
-  } catch(e) {}
-
-  dog.style.transform="scale(1.1)";
-  setTimeout(()=>dog.style.transform="scale(1)",100);
-
-  updateDisplay();
-  save(); // Sparar direkt vid klick så man inte förlorar poäng
-};
-
-// Passiv inkomst (Körs varje sekund)
-setInterval(()=>{
-  count+=passive;
-  updateDisplay();
-  save();
-},1000);
-
-// Nollställ spel
-document.getElementById("resetBtn").onclick=()=>{
-  localStorage.clear();
-  location.reload();
-};
-
-// Uppdatera gränssnittet
-function updateDisplay(){
-  countEl.textContent=formatNumber(count);
-
-  idleEl.textContent =
-    passive>0n
-    ? `Idle: ${formatNumber(passive)}/sek`
-    : "Ingen passiv inkomst";
-
-  // Gråa ut knappar som spelaren inte har råd med
-  upgradeButtons.forEach(item => {
-    item.element.disabled = (count < item.upgrade.cost);
-  });
-}
-
-// Spara all data
-function save(){
-  localStorage.setItem("count",count.toString());
-  localStorage.setItem("clickPower",clickPower.toString());
-  localStorage.setItem("passive",passive.toString());
-  
-  // Spara alla dynamiska priser som en array av strängar
-  let costsToSave = upgrades.map(u => u.cost.toString());
-  localStorage.setItem("upgradeCosts", JSON.stringify(costsToSave));
-}
-
-// Körs vid start
-updateDisplay();
-
+(()=>{
+'use strict';
+const $=id=>document.getElementById(id), KEY='dogClickerUltimate_v1';
+const fmt=n=>{n=BigInt(n);if(n<1000n)return n.toString();const units=['K','M','B','T','Qa','Qi','Sx','Sp','Oc','No','Dc'];let group=0,x=n;while(x>=1000n&&group<units.length){x/=1000n;group++}if(x>=1000n)return x.toString()+'e'+(group*3);const base=1000n**BigInt(group);const dec=(n%base)*10n/base;return x.toString()+'.'+dec.toString()+units[group-1]};
+const pow=(base,exp)=>{let a=BigInt(base),b=BigInt(exp),r=1n;while(b>0n){if(b&1n)r*=a;a*=a;b>>=1n}return r};
+const fresh=()=>({bones:'0',total:'0',click:'1',passive:'0',auto:'0',prestige:0,petCount:0,level:1,upgrades:{},pets:[],achievements:[],last:Date.now(),tab:'click',page:0});
+let s=fresh();try{const old=JSON.parse(localStorage.getItem(KEY)||'null');if(old)s={...s,...old}}catch(e){}
+const big=k=>{try{return BigInt(s[k]||0)}catch{return 0n}};
+let bones=big('bones'),total=big('total'),click=big('click'),passive=big('passive'),auto=big('auto');
+const setBig=()=>{s.bones=bones.toString();s.total=total.toString();s.click=click.toString();s.passive=passive.toString();s.auto=auto.toString()};
+const mult=()=>pow(2,Math.min(1000,s.prestige||0))*(1n+BigInt(s.petCount||0));
+function save(){setBig();s.last=Date.now();try{localStorage.setItem(KEY,JSON.stringify(s));$('saveStatus').textContent='Sparat '+new Date().toLocaleTimeString()}catch(e){$('saveStatus').textContent='Kunde inte spara: lagringen är full.'}}
+function log(t){$('log').textContent=t}
+function gain(n){n=BigInt(n);bones+=n;total+=n}
+function price(kind,i){let start=kind==='click'?50n:kind==='idle'?100n:kind==='auto'?500n:10000n;let rate=kind==='click'?115n:kind==='idle'?125n:kind==='auto'?140n:175n;return start*pow(rate,i*1)/pow(100,i)}
+const names={click:['Tasskraft','Superklo','Turbo-tass','Mega-vovve','Kosmisk skall'],idle:['Valp','Hundvakt','Hunddagis','Hundarmé','Vovvefabrik'],auto:['Tassrobot','Benmaskin','Hunddrönare','Vovve-AI','Galaktisk hundserver'],special:['Gyllene halsband','Baconsmak','Månskensben','Regnbågskoppel','Evig apport']};
+const descriptions={click:'Ökar hundben per klick',idle:'Ger fler hundben varje sekund',auto:'Klickar automatiskt åt dig',special:'Ökar din totala produktion'};
+const getLevel=(kind,i)=>Number(s.upgrades[kind+':'+i]||0);
+const cost=(kind,i)=>price(kind,i)*pow(125,getLevel(kind,i))/pow(100,getLevel(kind,i));
+function effect(kind,i){const tier=BigInt(i+1),lvl=BigInt(getLevel(kind,i)+1);if(kind==='click')click+=tier*lvl*mult();if(kind==='idle')passive+=tier*lvl*mult();if(kind==='auto')auto+=tier*lvl;if(kind==='special')s.petCount+=1}
+let currentTab=s.tab||'click',page=Number(s.page||0);
+function renderUpgrades(){currentTab=s.tab||currentTab;page=Math.max(0,Math.min(49999,page));const start=page*20;const wrap=$('upgrades');wrap.innerHTML='';for(let j=start;j<start+20;j++){const i=j;const c=cost(currentTab,i),lvl=getLevel(currentTab,i),title=names[currentTab][Math.min(4,Math.floor(i/100))]+' #'+(i+1);const row=document.createElement('div');row.className='upgrade';const info=document.createElement('div');info.className='info';info.innerHTML='<b>'+title+'</b><small>'+descriptions[currentTab]+' · Nivå '+lvl+'</small>';const btn=document.createElement('button');btn.className='action';btn.textContent='🐾 '+fmt(c);btn.disabled=bones<c;btn.onclick=()=>{if(bones<c)return;bones-=c;effect(currentTab,i);s.upgrades[currentTab+':'+i]=lvl+1;log('Köpte '+title+'!');render();save()};row.append(info,btn);wrap.append(row)}$('upgradePageLabel').textContent='Visar '+(start+1)+'–'+(start+20)+' · av 1 000 000';$('prevPage').disabled=page===0;$('nextPage').disabled=page>=49999}
+function levelNeed(){return pow(10,Math.min(100,Math.max(1,s.level))*2)}
+function render(){setBig();$('bones').textContent=fmt(bones);$('perClick').textContent=fmt(click*mult());$('perSec').textContent=fmt(passive*mult()+auto*click*mult());$('prestige').textContent=(s.prestige||0).toString();const need=levelNeed();$('levelText').textContent='Nivå '+s.level;$('nextLevel').textContent='Nästa nivå: '+fmt(need)+' totalt';$('levelBar').style.width=Math.min(100,Number(total%need*100n/need))+'%';$('prestigeInfo').textContent='Nästa prestige kräver '+fmt(pow(10,6+Math.min(100,s.prestige*2)))+' hundben totalt. Permanent bonus: x'+fmt(mult());$('prestigeBtn').disabled=total<pow(10,6+Math.min(100,s.prestige*2));$('petBtn').textContent='🐕 Köp kompis ('+fmt(10000n*pow(10,s.petCount))+')';$('petBtn').disabled=bones<10000n*pow(10,s.petCount);renderUpgrades();renderPets();renderAchievements()}
+function renderPets(){$('pets').textContent=s.pets.length?s.pets.join(' · '):'Inga kompisar ännu. Köp en kompis för att få permanent bonus.'}
+const milestones=[['Första tassen',1n],['Hundra ben',100n],['Tusen ben',1000n],['En miljon',1000000n],['Miljardär',1000000000n],['Biljonär',1000000000000n]];
+function renderAchievements(){const el=$('achievements');el.innerHTML='';milestones.forEach(([name,n])=>{const done=total>=n;if(done&&!s.achievements.includes(name)){s.achievements.push(name);log('Prestation upplåst: '+name)}const d=document.createElement('div');d.className='achievement '+(done?'':'locked');d.innerHTML='<span>'+(done?'🏆':'🔒')+' '+name+'</span><b>'+fmt(n)+'</b>';el.append(d)})}
+function clickDog(){const n=click*mult();gain(n);const f=document.createElement('span');f.className='click-float';f.textContent='+'+fmt(n);f.style.left=(35+Math.random()*30)+'%';f.style.top='42%';$('dog').parentElement.append(f);setTimeout(()=>f.remove(),800);render()}
+$('dog').addEventListener('click',clickDog);$('dog').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();clickDog()}});
+document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{currentTab=b.dataset.tab;s.tab=currentTab;page=0;s.page=0;document.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x===b));renderUpgrades();save()});
+$('prevPage').onclick=()=>{page--;s.page=page;renderUpgrades()};$('nextPage').onclick=()=>{page++;s.page=page;renderUpgrades()};
+$('petBtn').onclick=()=>{const c=10000n*pow(10,s.petCount);if(bones<c)return;bones-=c;s.petCount++;s.pets.push(['Luna','Bosse','Doris','Rex','Blixten','Cookie','Molly','Max'][s.pets.length%8]);log('En ny hundkompis flyttar in!');render();save()};
+$('prestigeBtn').onclick=()=>{const req=pow(10,6+Math.min(100,s.prestige*2));if(total<req)return;if(!confirm('Starta prestige? Dina hundben och vanliga uppgraderingar återställs.'))return;s.prestige++;bones=0n;total=0n;click=1n;passive=0n;auto=0n;s.upgrades={};s.level=1;log('Prestige '+s.prestige+'! Din permanenta bonus har ökat.');render();save()};
+$('saveBtn').onclick=save;
+$('exportBtn').onclick=()=>{save();const data=btoa(unescape(encodeURIComponent(JSON.stringify(s))));prompt('Kopiera din sparfil:',data)};
+$('importBtn').onclick=()=>{const data=prompt('Klistra in sparfilen:');if(!data)return;try{s=JSON.parse(decodeURIComponent(escape(atob(data))));bones=big('bones');total=big('total');click=big('click');passive=big('passive');auto=big('auto');render();save();log('Sparfil importerad.')}catch(e){alert('Ogiltig sparfil.')}};
+$('resetBtn').onclick=()=>{if(confirm('Radera all speldata permanent?')){localStorage.removeItem(KEY);location.reload()}};
+let goldenUntil=0;$('golden').onclick=()=>{if(Date.now()>goldenUntil)return;const bonus=(passive*60n+click*100n+100n)*mult();gain(bonus);$('golden').style.display='none';log('Gyllene hund! Du fick '+fmt(bonus)+' hundben.');render();save()};
+function spawnGolden(){if(Math.random()<.14){goldenUntil=Date.now()+9000;$('golden').style.display='block';setTimeout(()=>{if(Date.now()>goldenUntil)$('golden').style.display='none'},9200)}}
+let elapsed=Math.max(0,Math.min(8*60*60*1000,Date.now()-(s.last||Date.now())));if(elapsed>5000){const offline=(passive*BigInt(Math.floor(elapsed/1000))+auto*click*BigInt(Math.floor(elapsed/1000)))*mult()/2n;gain(offline);log('Välkommen tillbaka! Du tjänade '+fmt(offline)+' hundben offline.')}
+let last=Date.now();setInterval(()=>{const now=Date.now(),dt=Math.min(5,Math.max(0,(now-last)/1000));last=now;const earned=(passive*mult()+auto*click*mult())*BigInt(Math.floor(dt*100))/100n;if(earned>0n)gain(earned);while(total>=levelNeed()&&s.level<1000000)s.level++;render();save();spawnGolden()},1000);
+render();save();
+})();
 </script>
-
 </body>
 </html>
