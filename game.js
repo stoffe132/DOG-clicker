@@ -609,7 +609,8 @@ function offlineEarnings() {
   }
 }
 function onClick(event) {
-  const button = event.target.closest && event.target.closest('button');
+  const target = event && event.target;
+  const button = target && typeof target.closest === 'function' ? target.closest('button') : null;
   if (!button) return;
   if (button.disabled) return;
 
