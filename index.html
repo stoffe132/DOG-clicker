@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0b0d14"><meta name="description" content="DOG CLICKER — bygg ditt hundimperium med uppgraderingar, producenter, husdjur och prestige.">
-<title>DOG CLICKER — Dog Empire</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="style.css?v=2.1.2">
+<title>DOG CLICKER — Dog Empire</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="./style.css?v=3.0.0">
 </head>
 <body>
 <div class="app">
@@ -21,7 +21,7 @@
 <div class="metric"><div class="metric-label">⚡ Per sekund</div><div class="metric-value" id="incomeValue">0</div><div class="metric-foot">Automatisk produktion</div></div>
 <div class="metric"><div class="metric-label">✦ Prestige</div><div class="metric-value" id="prestigeValue">0</div><div class="metric-foot" id="prestigeFoot">Permanent bonus</div></div></section>
 <section class="view active" id="view-dashboard"><div class="grid-main"><div class="stack">
-<section class="card dog-card"><div class="golden-event"><button id="goldenButton">✨ GYLLENE HUND — KLICKA!</button></div><div class="dog-stage"><button class="dog-button" id="dogButton" aria-label="Klicka på hunden"><img class="dog-image" src="dog.jpg" alt="Din hund" onerror="this.style.display='none';document.getElementById('dogFallback').hidden=false"><span class="dog-emoji" id="dogFallback" hidden>🐶</span></button></div><div class="dog-caption"><b id="dogName">Din bästa vän</b><span>Klicka på hunden för att samla hundben</span></div><div class="click-hint">TAPPA · KLICKA · SAMLA</div></section>
+<section class="card dog-card"><div class="golden-event"><button id="goldenButton">✨ GYLLENE HUND — KLICKA!</button></div><div class="dog-stage"><button class="dog-button" id="dogButton" aria-label="Klicka på hunden"><img class="dog-image" src="./dog.jpg" alt="Din hund" onerror="this.style.display='none';document.getElementById('dogFallback').hidden=false"><span class="dog-emoji" id="dogFallback" hidden>🐶</span></button></div><div class="dog-caption"><b id="dogName">Din bästa vän</b><span>Klicka på hunden för att samla hundben</span></div><div class="click-hint">TAPPA · KLICKA · SAMLA</div></section>
 <section class="card"><div class="card-head"><div><h2 class="card-title">Din nivå</h2><div class="card-sub" id="levelDescription">Varje nivå ger dig nya mål</div></div><span class="pill gold" id="levelBadge">NIVÅ 1</span></div><div class="level-line"><span id="levelProgressText">0 / 100 hundben</span><span id="levelPercent">0%</span></div><div class="progress"><i id="levelProgress"></i></div><div class="quick-actions"><button class="btn primary" id="quickUpgrade">⬆ Visa uppgraderingar</button><button class="btn" id="quickProducer">⚙ Bygg produktion</button></div></section></div>
 <div class="stack">
 <section class="card"><div class="card-head"><div><h2 class="card-title">Dagens uppdrag</h2><div class="card-sub">Små mål ger extra hundben</div></div><span class="pill" id="dailyReset">IDAG</span></div><div class="quest" id="questList"></div></section>
@@ -38,4 +38,15 @@
 <footer class="footer">DOG EMPIRE · Byggt för hundälskare · Din sparfil stannar i din webbläsare</footer>
 </main></div>
 <nav class="mobile-nav" id="mobileNav"><button class="active" data-view="dashboard"><span>⌂</span>Hem</button><button data-view="upgrades"><span>⬆</span>Uppgraderingar</button><button data-view="producers"><span>⚙</span>Fabrik</button><button data-view="pets"><span>🐕</span>Hundar</button><button data-view="prestige"><span>✦</span>Prestige</button></nav>
-<script src="game.js?v=2.1.2" defer></script></body></html>
+<div id="fatalStatus" hidden role="alert" style="margin:12px 0;padding:12px;border:1px solid #b44;background:#351923;color:#ffd8df;border-radius:10px;font:14px system-ui"></div>
+<script>
+window.addEventListener('error', function(e) {
+  var p = document.getElementById('fatalStatus');
+  if (p) { p.hidden = false; p.textContent = 'JavaScript-fel: ' + (e.message || 'Okänt fel') + (e.filename ? ' · ' + e.filename.split('/').pop() : ''); }
+});
+window.addEventListener('unhandledrejection', function(e) {
+  var p = document.getElementById('fatalStatus');
+  if (p) { p.hidden = false; p.textContent = 'Fel i spelet: ' + String(e.reason || 'Okänt fel'); }
+});
+</script>
+<script src="./game.js?v=3.0.0" defer onerror="document.getElementById('fatalStatus').hidden=false;document.getElementById('fatalStatus').textContent='Kunde inte ladda game.js. Kontrollera att du öppnar spelets GitHub Pages-adress.'"></script></body></html>
