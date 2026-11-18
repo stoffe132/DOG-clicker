@@ -4,9 +4,9 @@ const $=id=>document.getElementById(id), SAVE='dogEmpire_v2', LEGACY='dogClicker
 const fmt=v=>{let n;try{n=BigInt(v)}catch(_){n=0n}if(n<1000n)return n.toString();const u=['','K','M','B','T','Qa','Qi','Sx','Sp','Oc','No','Dc'];let g=0,d=1n;while(n>=d*1000n&&g<u.length-1){d*=1000n;g++}return (n/d).toString()+(((n%d)*10n/d)>0n?'.'+((n%d)*10n/d):'')+u[g]};
 const big=v=>{try{return BigInt(v||0)}catch(_){return 0n}}, clamp=(v,a,b)=>Math.max(a,Math.min(b,Number(v)||0));
 const today=()=>{const d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()};
-const fresh=()=>({version:2,currency:'0',lifetime:'0',runEarned:'0',clicks:0,level:1,prestige:0,stars:0,upgrades:{},generators:{},pets:{},perks:{},achievements:[],settings:{sound:true,reducedMotion:false},boostUntil:0,daily:{date:today(),clicks:0,purchases:0,earned:'0',claimed:[]},logs:[],last:Date.now(),playSeconds:0});
+const fresh=()=>({version:2,currency:'0',lifetime:'0',runEarned:'0',legacyClick:'0',legacyPassive:'0',legacyAuto:'0',clicks:0,level:1,prestige:0,stars:0,upgrades:{},generators:{},pets:{},perks:{},achievements:[],settings:{sound:true,reducedMotion:false},boostUntil:0,daily:{date:today(),clicks:0,purchases:0,earned:'0',claimed:[]},logs:[],last:Date.now(),playSeconds:0});
 let s=fresh();
-try{const raw=localStorage.getItem(SAVE)||localStorage.getItem(LEGACY);if(raw){const x=JSON.parse(raw);s={...s,...x};s.currency=String(x.currency??x.bones??'0');s.lifetime=String(x.lifetime??x.total??'0');s.runEarned=String(x.runEarned??x.total??'0');s.upgrades={...(x.upgrades||{})};s.generators={...(x.generators||{})};s.pets={...(x.petOwned||{})};s.perks={...(x.perks||{})};s.settings={...s.settings,...(x.settings||{})};s.daily={...s.daily,...(x.daily||{})};if(s.daily.date!==today())s.daily={date:today(),clicks:0,purchases:0,earned:'0',claimed:[]};}}catch(e){console.warn('Save load',e)}
+try{const raw=localStorage.getItem(SAVE)||localStorage.getItem(LEGACY);if(raw){const x=JSON.parse(raw);s={...s,...x};s.currency=String(x.currency??x.bones??'0');s.lifetime=String(x.lifetime??x.total??'0');s.runEarned=String(x.runEarned??x.total??'0');s.legacyClick=String(x.legacyClick??x.click??'0');s.legacyPassive=String(x.legacyPassive??x.passive??'0');s.legacyAuto=String(x.legacyAuto??x.auto??'0');s.upgrades={...(x.upgrades||{})};s.generators={...(x.generators||{})};s.pets={...(x.petOwned||{})};s.perks={...(x.perks||{})};s.settings={...s.settings,...(x.settings||{})};s.daily={...s.daily,...(x.daily||{})};if(s.daily.date!==today())s.daily={date:today(),clicks:0,purchases:0,earned:'0',claimed:[]};}}catch(e){console.warn('Save load',e)}
 const U=[
 {id:'tap',name:'Tass-träning',icon:'🐾',cat:'click',desc:'+2 grundkraft per klick och nivå.',base:30n,rate:1150,kind:'flat',power:2},
 {id:'tapmult',name:'Superstuds',icon:'💪',cat:'click',desc:'+20% klickkraft per nivå.',base:250n,rate:1220,kind:'mult',power:1200},
@@ -20,7 +20,7 @@ const U=[
 {id:'luck',name:'Gyllene nos',icon:'✨',cat:'fortune',desc:G('Gör gyllene hundar vanligare.'),base:8000n,rate:1380,kind:'luck',max:100},
 {id:'gold',name:'Guldfångare',icon:'🪙',cat:'fortune',desc:'+35% belöning från gyllene hundar.',base:14000n,rate:1390,kind:'gold'},
 {id:'offline',name:'Drömmarnas hundvakt',icon:'🌙',cat:'utility',desc:'+5 procentenheter offline-inkomst.',base:9000n,rate:1360,kind:'offline',max:10},
-{id:'coupon',name:'Ben-rabatt',icon:'🏷️',cat:'utility',desc'-1% kostnad per nivå.',base:22000n,rate:1450,kind:'coupon',max:30},
+{id:'coupon',name:'Ben-rabatt',icon:'🏷️',cat:'utility',desc:'-1% kostnad per nivå.',base:22000n,rate:1450,kind:'coupon',max:30},
 {id:'quest',name:'Uppdragsproffs',icon:'📋',cat:'utility',desc:'+20% dagliga uppdragsbelöningar.',base:12000n,rate:1400,kind:'quest'},
 {id:'bond',name:'Flockens band',icon:'❤️',cat:'income',desc:'Förstärker bonusen från husdjur.',base:45000n,rate:1500,kind:'bond'}
 ];
@@ -90,8 +90,8 @@ function sqrt(n){if(n<2n)return n;let x=n/2n,y=(x+n/x)/2n;while(y<x){x=y;y=(x+n/
 function prestigeReward(){const r=big(s.runEarned)/prestigeNeed();return r<1n?0:Number(sqrt(r)>1000000n?1000000n:sqrt(r))}
 function globalBP(){return 1000+s.stars*100+totalPets()*(30+lv('bond')*10)}
 function multiplier(){return BigInt(globalBP())*powRatio(1000n,1100,1000,lv('empire'))/1000n}
-function clickVal(){let v=(1n+BigInt(lv('tap')*2))*multiplier();v=v*powRatio(1000n,1200,1000,lv('tapmult'))/1000n;v=v*powRatio(1000n,1100,1000,lv('gloves'))/1000n;v=v*powRatio(1000n,1250,1000,rc('star'))/1000n;return v>0n?v:1n}
-function autoVal(){let clicks=BigInt(lv('auto')+Number(big(s.legacyAuto||0)));return clickVal()*clicks*powRatio(1000n,1150,1000,lv('automult'))/1000n}
+function clickVal(){let v=(1n+big(s.legacyClick)+BigInt(lv('tap')*2))*multiplier();v=v*powRatio(1000n,1200,1000,lv('tapmult'))/1000n;v=v*powRatio(1000n,1100,1000,lv('gloves'))/1000n;v=v*powRatio(1000n,1250,1000,rc('star'))/1000n;return v>0n?v:1n}
+function autoVal(){let clicks=BigInt(lv('auto'))+big(s.legacyAuto||0);return clickVal()*clicks*powRatio(1000n,1150,1000,lv('automult'))/1000n}
 function prodVal(){let n=big(s.legacyPassive||0);for(const g of G)n+=g.output*BigInt(gc(g.id));n=n*multiplier()/1000n;n=n*powRatio(1000n,1150,1000,lv('kennel'))/1000n;n=n*powRatio(1000n,1150,1000,rc('factory'))/1000n;return n}
 function income(){let n=prodVal()+autoVal();if(Date.now()<s.boostUntil)n*=2n;return n}
 function afford(n){return big(s.currency)>=n}
